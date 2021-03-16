@@ -1,0 +1,24 @@
+spring:
+  profiles:
+    active: local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/data?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 19m28b37!
+
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        ddl-auto: create
+    generate-ddl: true
+---
+
+spring:
+  profiles: local
+    include: oauth
+server:
+  port: 8079
