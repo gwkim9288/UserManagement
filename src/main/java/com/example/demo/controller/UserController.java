@@ -2,27 +2,41 @@ package com.example.demo.controller;
 
 import com.example.demo.domain.UserEntity;
 import com.example.demo.exception.UserNotFoundException;
+import com.example.demo.resource.UserResourceAssembler;
 import com.example.demo.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
+import org.hibernate.EntityMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.swing.text.html.parser.Entity;
 import java.net.URI;
 import java.util.List;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
 @RestController
+@RequiredArgsConstructor
 public class UserController{
 
-    @Autowired
-    UserService userService;
+    private final UserService userService;
 
     @GetMapping("/users/{user_id}/get")
-    public UserEntity getUserByID(@PathVariable int user_id){
-        if(userService.getUserById(user_id)==null){
+    public ResponseEntity getUserByID(@PathVariable int user_id){
+        UserEntity user = userService.getUserById(user_id);
+        if(user==null){
             return null;
         }
-        return userService.getUserById(user_id);
+        //Hateaos 적용하여 resource받아오기
+        UserResourceAssembler userResourceAssembler = new UserResourceAssembler();
+        EntityModel<UserEntity> userResource = userResourceAssembler.toModel(user);
+        userResource.add(linkTo(UserController.class).withRel("getUserByID"));
+
+        return ResponseEntity.ok(userResourceAssembler.toModel(user));
     }
 
     @GetMapping("/users/list")
