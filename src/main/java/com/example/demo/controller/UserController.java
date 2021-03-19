@@ -24,6 +24,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class UserController{
 
     private final UserService userService;
+    private final UserValidator userValidator;
 
     @GetMapping("/users/{user_id}/get")
     public ResponseEntity getUserByID(@PathVariable int user_id){
@@ -45,7 +46,7 @@ public class UserController{
     }
 
     @PostMapping("/users/post")
-    public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user){
+    public ResponseEntity<UserEntity> createUser(@RequestBody @Valid UserEntity user){
         userService.createUser(user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(user.getId()).toUri();
