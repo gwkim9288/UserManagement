@@ -10,10 +10,10 @@ import org.springframework.web.util.UriComponents;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
-public class UserResourceAssembler implements RepresentationModelAssembler<UserEntity, EntityModel<UserEntity>> {
+public class UserResource extends EntityModel<UserEntity> {
 
-    @Override
-    public EntityModel<UserEntity> toModel(UserEntity entity) {
+
+    public static EntityModel<UserEntity> modelOf(UserEntity entity) {
         EntityModel<UserEntity> userEntityModel = EntityModel.of(entity);
         userEntityModel.add(linkTo(UserController.class).slash(entity.getId()).withSelfRel());
         return userEntityModel;

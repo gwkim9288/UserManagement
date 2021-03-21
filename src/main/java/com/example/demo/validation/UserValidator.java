@@ -22,7 +22,7 @@ public class UserValidator implements Validator {
 
     public void validate(Object target, Errors errors) {
         UserDTO userDTO = (UserDTO) target;
-        UserEntity user1 =  userRepository.findById(userDTO.getName());
+        UserEntity user1 =  userRepository.findByName(userDTO.getName());
         if (user1 != null) {
             errors.rejectValue("username", "wrongValue", "someone already use this name");
         }

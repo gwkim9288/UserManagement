@@ -1,16 +1,26 @@
 package com.example.demo.service;
 
+import com.example.demo.domain.UserDTO;
 import com.example.demo.domain.UserEntity;
 import com.example.demo.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class UserService {
-    @Autowired
-    UserRepository userRepo;
+
+
+    private final ModelMapper modelMapper;
+    private final UserRepository userRepo;
 
     public UserEntity getUserById(int id){
         if(!userRepo.existsById(id))
@@ -18,8 +28,10 @@ public class UserService {
         return userRepo.findById(id).get();
     }
 
-    public boolean createUser(UserEntity user){
-        userRepo.save(user);
+    public boolean createUser(UserDTO userDTO){
+
+        UserEntity mappingUser = modelMapper.map(userDTO, UserEntity.class);
+        userRepo.save(mappingUser);
         return true;
     }
 
@@ -37,7 +49,7 @@ public class UserService {
         return true;
     }
 
-    public List<UserEntity> getList(){
+    public List<UserEntity> getUserList(){
         return userRepo.findAll();
     }
 }
