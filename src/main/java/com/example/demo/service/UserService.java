@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ import java.util.List;
 public class UserService {
 
 
-    private final ModelMapper modelMapper;
+    private ModelMapper modelMapper = new ModelMapper();
     private final UserRepository userRepo;
 
     public UserEntity getUserById(int id){
@@ -36,17 +37,21 @@ public class UserService {
     }
 
     public boolean deleteUserById(int id){
+
         if(!userRepo.existsById(id))
             return false;
         userRepo.deleteById(id);
         return true;
     }
 
-    public boolean updateUser(int id, UserEntity user){
+    public UserEntity updateUser(int id, UserDTO userDTO){
         if(!userRepo.existsById(id))
-            return false;
+            return null;
+        UserEntity user = userRepo.findById(id).get();
+        user.update(userDTO.getName(), userDTO.getEmail());
         userRepo.save(user);
-        return true;
+        //UserDTO mappingUserDTO = modelMapper.map(user,UserDTO.class);
+        return user;
     }
 
     public List<UserEntity> getUserList(){

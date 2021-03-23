@@ -9,6 +9,7 @@ import com.example.demo.resource.UserResource;
 import com.example.demo.service.UserService;
 import com.example.demo.validation.UserValidator;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -38,7 +39,7 @@ public class UserController {
     public ResponseEntity getUserByID(@PathVariable int user_id) {
         UserEntity user = userService.getUserById(user_id);
         if (user == null) {
-            return null;
+            return ResponseEntity.notFound().build();
         }
         //Hateaos 적용하여 resource받아오기
         EntityModel<UserEntity> userResource = UserResource.modelOf(user);
@@ -76,14 +77,21 @@ public class UserController {
     }
 
     @DeleteMapping("/{user_id}")
-    public boolean deleteUser(@PathVariable int user_id) {
-        return userService.deleteUserById(user_id);
+    public ResponseEntity deleteUser(@PathVariable int user_id) {
+        if(!userService.deleteUserById(user_id))
+            return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{user_id}")
-    public void updateUser(@RequestBody UserEntity user, @PathVariable int user_id) {
-        if (userService.updateUser(user_id, user)) {
+    public ResponseEntity updateUser(@RequestBody UserDTO userDTO, @PathVariable int user_id) {
+        UserEntity user = userService.updateUser(user_id,userDTO);
+        if (user == null) {
             throw new UserNotFoundException(String.format("User Not Found : id = %d", user_id));
         }
+        EntityModel<UserEntity> userResource = UserResource.modelOf(user);
+        userResource.add(linkTo(UserController.class).withRel("list"));
+        return ResponseEntity.ok(userResource);
     }
 }
