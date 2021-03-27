@@ -1,7 +1,10 @@
 package com.example.demo.config;
 import com.example.demo.domain.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
@@ -9,26 +12,28 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .headers().frameOptions().disable()
-                .and()
                 .authorizeRequests()
-                .antMatchers("/", "/css/**", "/images/**",
-                        "/js/**", "/h2-console/**").permitAll()
-                .antMatchers("/api/v1/**").hasRole(Role.
-                USER.name())
-                .anyRequest().authenticated()
+                .mvcMatchers(HttpMethod.POST, "/users").permitAll()
+                //.antMatchers("/user/**").permitAll()
+                .anyRequest().authenticated();
+        http
+                .formLogin()
+                .loginPage("/login").permitAll()
                 .and()
                 .logout()
-                .logoutSuccessUrl("/")
-                .and()
-                .oauth2Login()
-                .userInfoEndpoint()
-                .userService(customOAuth2UserService);
+                .logoutSuccessUrl("/");
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception
+    {
+        web.ignoring()
+                .mvcMatchers("/favicon.ico","/resources/**","/error")
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 }

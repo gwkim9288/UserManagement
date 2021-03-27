@@ -29,11 +29,11 @@ public class UserService {
         return userRepo.findById(id).get();
     }
 
-    public boolean createUser(UserDTO userDTO){
+    public UserEntity createUser(UserDTO userDTO){
 
         UserEntity mappingUser = modelMapper.map(userDTO, UserEntity.class);
         userRepo.save(mappingUser);
-        return true;
+        return mappingUser;
     }
 
     public boolean deleteUserById(int id){

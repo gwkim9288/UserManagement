@@ -26,23 +26,23 @@ public class UserEntity {
     private String email;
 
     @Column
-    private String picture;
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
     @Builder
-    public UserEntity(String name, String email, String picture, Role role) {
+    public UserEntity(String name, String email, String password, Role role) {
         this.name = name;
         this.email = email;
-        this.picture = picture;
+        this.password = password;
         this.role = role;
     }
 
-    public UserEntity update(String name, String picture) {
+    public UserEntity update(String name, String password) {
         this.name = name;
-        this.picture = picture;
+        this.password = password;
 
         return this;
     }
