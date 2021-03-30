@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.controller.UserController;
+import com.example.demo.domain.Role;
 import com.example.demo.domain.UserAccount;
 import com.example.demo.domain.UserDTO;
 import com.example.demo.domain.UserEntity;
@@ -39,7 +40,7 @@ public class IndexController {
 
         @GetMapping("/")
         public RepresentationModel index(){
-        var index = new RepresentationModel<>();
+        RepresentationModel index = new RepresentationModel<>();
         index.add(linkTo(UserController.class).withRel("main"));
         return index;
     }
@@ -57,7 +58,7 @@ public class IndexController {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 new UserAccount(user),
                 user.getPassword(),
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                List.of(new SimpleGrantedAuthority(user.getRoleKey()))
         );
         SecurityContextHolder.getContext().setAuthentication(token);
     }
@@ -66,6 +67,7 @@ public class IndexController {
     public ResponseEntity<Object> createUser(@RequestBody UserDTO userDTO){
         try {
             userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            userDTO.setRole(Role.USER);
             UserEntity user = userService.createUser(userDTO);
             URI location = linkTo(UserController.class).slash(user.getId()).toUri();
             EntityModel<UserEntity> userResource = UserResource.modelOf(user);

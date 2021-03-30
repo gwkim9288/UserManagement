@@ -20,4 +20,6 @@ public class UserDTO implements Serializable {
 
     @NotEmpty
     private String email;
+
+    private Role role;
 }
